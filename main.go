@@ -74,7 +74,6 @@ func main() {
 		systemPrompt = modelMeta[1]
 		log.Println("Testing using langchain and ollama " + modelName)
 		ctx := context.Background()
-		// runServer(ctx)
 		makeLLMCall(ctx, baseURL, apiKey, modelName, systemPrompt)
 	}
 
