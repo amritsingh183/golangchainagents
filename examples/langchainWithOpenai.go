@@ -39,7 +39,7 @@ func (tx *TaxiTool) Definition() *toolbox.ToolDefinition {
 		},
 	}
 }
-func (tx *TaxiTool) Run(arguments string) *toolbox.WorkDone {
+func (tx *TaxiTool) Call(ctx context.Context, arguments string) *toolbox.WorkDone {
 	var args struct {
 		Source      string `json:"source"`
 		Destination string `json:"destination"`
@@ -87,7 +87,7 @@ func (w *WeatherTool) Definition() *toolbox.ToolDefinition {
 		},
 	}
 }
-func (w *WeatherTool) Run(arguments string) *toolbox.WorkDone {
+func (w *WeatherTool) Call(ctx context.Context, arguments string) *toolbox.WorkDone {
 	// Extract the location from the function call arguments
 	var args struct {
 		Location string `json:"location"`
@@ -248,7 +248,7 @@ func makeLLMCall(ctx context.Context, baseURL, apiKey, modelName, systemPrompt s
 				log.Fatal("No function call")
 			}
 			for _, toolCall := range choice.ToolCalls {
-				toolResponse := toolBox.UseTool(toolCall.FunctionCall.Name, toolCall.FunctionCall.Arguments)
+				toolResponse := toolBox.UseTool(ctx, toolCall.FunctionCall.Name, toolCall.FunctionCall.Arguments)
 				if toolResponse.Error != nil {
 					log.Fatal(err)
 				}

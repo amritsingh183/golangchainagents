@@ -1,5 +1,7 @@
 package toolbox
 
+import "context"
+
 type ToolDefinition struct {
 	Type string
 	// Name of the function
@@ -14,18 +16,16 @@ type WorkDone struct {
 	Response string
 }
 type GetsWorkDone interface {
-	// jsonString is {"argName":"argValue"..}
-	Run(jsonString string) *WorkDone
-	// name, description, parameters
+	Call(context.Context, string) *WorkDone
 	Definition() *ToolDefinition
 }
 
 type ToolBox []GetsWorkDone
 
-func (tb *ToolBox) UseTool(toolName string, toolArgs string) *WorkDone {
+func (tb *ToolBox) UseTool(ctx context.Context, toolName string, toolArgs string) *WorkDone {
 	for _, tool := range *tb {
 		if tool.Definition().Name == toolName {
-			return tool.Run(toolArgs)
+			return tool.Call(ctx, toolArgs)
 		}
 	}
 	return nil
