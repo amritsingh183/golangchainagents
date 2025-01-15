@@ -39,24 +39,18 @@ func (tx *TaxiTool) Definition() *toolbox.ToolDefinition {
 		},
 	}
 }
-func (tx *TaxiTool) Call(ctx context.Context, arguments string) *toolbox.WorkDone {
+func (tx *TaxiTool) Call(ctx context.Context, arguments string) (string, error) {
 	var args struct {
 		Source      string `json:"source"`
 		Destination string `json:"destination"`
 	}
 	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-		return &toolbox.WorkDone{
-			Error:    err,
-			Response: "",
-		}
+		return "", err
 	}
 
 	ride := "booking taxi from " + args.Source + " to " + args.Destination
 
-	return &toolbox.WorkDone{
-		Error:    nil,
-		Response: ride,
-	}
+	return ride, nil
 }
 
 type WeatherTool struct {
@@ -94,19 +88,13 @@ func (w *WeatherTool) Call(ctx context.Context, arguments string) *toolbox.WorkD
 		Unit     string `json:"unit"`
 	}
 	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-		return &toolbox.WorkDone{
-			Error:    err,
-			Response: "",
-		}
+		return "", err
 	}
 
 	// Simulate getting weather data
 	weatherData := fmt.Sprintf("Weather in %s is Sunny, 25° %s", args.Location, args.Unit)
 
-	return &toolbox.WorkDone{
-		Error:    nil,
-		Response: weatherData,
-	}
+	return weatherData, nil
 }
 
 var templates = map[string]string{
@@ -248,8 +236,8 @@ func makeLLMCall(ctx context.Context, baseURL, apiKey, modelName, systemPrompt s
 				log.Fatal("No function call")
 			}
 			for _, toolCall := range choice.ToolCalls {
-				toolResponse := toolBox.UseTool(ctx, toolCall.FunctionCall.Name, toolCall.FunctionCall.Arguments)
-				if toolResponse.Error != nil {
+				toolResponse, err := toolBox.UseTool(ctx, toolCall.FunctionCall.Name, toolCall.FunctionCall.Arguments)
+				if err != nil {
 					log.Fatal(err)
 				}
 				assistantResponse := llms.MessageContent{
@@ -265,14 +253,14 @@ func makeLLMCall(ctx context.Context, baseURL, apiKey, modelName, systemPrompt s
 						},
 					},
 				}
-				log.Printf("\n\n ToolCallResponse: %v", toolResponse.Response)
+				log.Printf("\n\n ToolCallResponse: %v", toolResponse)
 				tool_result := llms.MessageContent{
 					Role: llms.ChatMessageTypeTool,
 					Parts: []llms.ContentPart{
 						llms.ToolCallResponse{
 							ToolCallID: toolCall.ID,
 							Name:       toolCall.FunctionCall.Name,
-							Content:    toolResponse.Response,
+							Content:    toolResponse,
 						},
 					},
 				}
