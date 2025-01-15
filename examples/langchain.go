@@ -1,14 +1,113 @@
 package main
 
 import (
-	tools "amritsingh183/golangchainagents/pkg/tool"
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+
+	toolbox "github.com/amritsingh183/golangchainagents/pkg/toolbox"
 
 	"github.com/tmc/langchaingo/llms"
 	langchainOpenAI "github.com/tmc/langchaingo/llms/openai"
 )
+
+type TaxiTool struct {
+}
+
+func (tx *TaxiTool) Definition() *toolbox.ToolDefinition {
+	return &toolbox.ToolDefinition{
+		Name:        "book_taxi",
+		Description: "Book a taxi to go from source to destination",
+		Parameters: map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{
+				"source": map[string]string{
+					"description": "The starting location of the taxi ride",
+					"type":        "string",
+				},
+				"destination": map[string]string{
+					"description": "The final destination of the taxi ride",
+					"type":        "string",
+				},
+			},
+			"required": []string{
+				"source",
+				"destination",
+			},
+		},
+	}
+}
+func (tx *TaxiTool) Run(arguments string) *toolbox.WorkDone {
+	var args struct {
+		Source      string `json:"source"`
+		Destination string `json:"destination"`
+	}
+	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+		return &toolbox.WorkDone{
+			Error:    err,
+			Response: "",
+		}
+	}
+
+	ride := "booking taxi from " + args.Source + " to " + args.Destination
+
+	return &toolbox.WorkDone{
+		Error:    nil,
+		Response: ride,
+	}
+}
+
+type WeatherTool struct {
+}
+
+func (w *WeatherTool) Definition() *toolbox.ToolDefinition {
+	return &toolbox.ToolDefinition{
+		Name:        "get_weather",
+		Description: "Get the weather in a given location",
+		Parameters: map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{
+				"location": map[string]string{
+					"description": "The name/location of place",
+					"type":        "string",
+				},
+				"unit": map[string]interface{}{
+					"enum": []string{
+						"celsius",
+						"fahrenheit",
+					},
+					"type": "string",
+				},
+			},
+			"required": []string{
+				"location",
+			},
+		},
+	}
+}
+func (w *WeatherTool) Run(arguments string) *toolbox.WorkDone {
+	// Extract the location from the function call arguments
+	var args struct {
+		Location string `json:"location"`
+		Unit     string `json:"unit"`
+	}
+	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+		return &toolbox.WorkDone{
+			Error:    err,
+			Response: "",
+		}
+	}
+
+	// Simulate getting weather data
+	weatherData := fmt.Sprintf("Weather in %s is Sunny, 25° %s", args.Location, args.Unit)
+
+	return &toolbox.WorkDone{
+		Error:    nil,
+		Response: weatherData,
+	}
+}
 
 var templates = map[string]string{
 	"smolM2": `You are an expert in composing functions. You are given a question and a set of possible functions. 
@@ -83,9 +182,9 @@ func makeLLMCall(ctx context.Context, baseURL, apiKey, modelName, systemPrompt s
 		// llms.WithTemperature(0.9),
 		// llms.WithTopP(0.65),
 	}
-	toolBox := tools.ToolBox{
-		&tools.WeatherTool{},
-		&tools.TaxiTool{},
+	toolBox := toolbox.ToolBox{
+		&toolbox.WeatherTool{},
+		&toolbox.TaxiTool{},
 	}
 	llmTools := make([]llms.Tool, len(toolBox))
 	for i, tl := range toolBox {

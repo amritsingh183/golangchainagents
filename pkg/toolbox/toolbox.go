@@ -2,6 +2,7 @@ package tool
 
 type ToolDefinition struct {
 	Type string
+	// Name of the function
 	Name string
 	// Description is a description of the function.
 	Description string
