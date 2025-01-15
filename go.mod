@@ -1,4 +1,4 @@
-module amritsingh183/golangchainagents
+module github.com/amritsingh183/golangchainagents
 
 go 1.22.0
 
