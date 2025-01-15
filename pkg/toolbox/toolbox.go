@@ -1,4 +1,4 @@
-package tool
+package toolbox
 
 type ToolDefinition struct {
 	Type string
