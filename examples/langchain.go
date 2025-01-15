@@ -183,8 +183,8 @@ func makeLLMCall(ctx context.Context, baseURL, apiKey, modelName, systemPrompt s
 		// llms.WithTopP(0.65),
 	}
 	toolBox := toolbox.ToolBox{
-		&toolbox.WeatherTool{},
-		&toolbox.TaxiTool{},
+		&WeatherTool{},
+		&TaxiTool{},
 	}
 	llmTools := make([]llms.Tool, len(toolBox))
 	for i, tl := range toolBox {
