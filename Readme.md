@@ -6,10 +6,17 @@ Simply get the module using `go get`
 go get github.com/amritsingh183/golangchainagents
 ```
 
+## How to define and use the toolBox
+
+You may checkout the full examples:
+
+- [Local models](examples/langchainWithLocalModels.go)
+- [OpenAI models](examples/langchainWitOpenai.go)
+
 ## Langchain agents using localollama models
 
 - [Create local model using ollama](examples/models/Readme.md)
-- Checkout [ToolBox](pkg/toolbox/toolbox.go) and examples usage at mock of [Taxi Booking tool](examples/langchain.go) and [weather checking tool](examples/langchain.go) which allows to have a similar experience that you get while using tools in [crewai](https://docs.crewai.com/concepts/tools#using-crewai-tools).
+- Checkout [ToolBox](pkg/toolbox/toolbox.go) and examples usage at mock of [Taxi Booking tool](examples/langchainWithLocalModels.go) and [weather checking tool](examples/langchainWithLocalModels.go) which allows to have a similar experience that you get while using tools in [crewai](https://docs.crewai.com/concepts/tools#using-crewai-tools).
 - The [examples/models](docs/models) help you get tool-enabled LLM (credits: [ollama](https://ollama.com/))
 - Langchain itslef is very powerful and easy to use, but this repo helps you to build tools and integrate them with lanchain with just few lines of code, see [ToolBox](pkg/toolbox/toolbox.go). All you need is just implement `GetsWorkDone interface`. Check the taxi and weather tools mentioned above.
 - This repository contains code which enables you to make function/tool calls using small large language models (llms).
